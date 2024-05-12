@@ -32,7 +32,7 @@ class CountUntilClientNode(Node):
                                 add_done_callback(self.goal_resopnse_callback)
                                 
         #canceling the goal after 2 sec
-        self.timer_ = self.create_timer(2.0, self.cancel_goal)
+        #self.timer_ = self.create_timer(2.0, self.cancel_goal)
         
     def cancel_goal(self):
         self.get_logger().info("send a cancel request")
@@ -70,6 +70,7 @@ def main(args=None):
     rclpy.init(args=args)
     node = CountUntilClientNode()
     node.send_goal(5, 1.0)
+    #node.send_goal(14, 0.50) 
     rclpy.spin(node)
     rclpy.shutdown()
 
