@@ -88,7 +88,6 @@ class MoveToPositionNode(Node):
         #get request from goal
         target_position = goal_handle.request.target_position
         velocity = goal_handle.request.velocity
-        rem_dest =abs(target_position - self.position_)
         
         #Execute the action
         self.get_logger().info("Executing the goal")
@@ -110,6 +109,12 @@ class MoveToPositionNode(Node):
                 if self.goal_policy_ == 3:
                     self.process_next_goal_in_queue()
                 return result
+            
+            rem_dest =abs(target_position - self.position_)
+            
+            self.get_logger().debug(f"current pos: {self.position_}")
+            self.get_logger().debug(f"rem dis: {rem_dest}")
+            
             
             #prosess goal
             if target_position > self.position_:
