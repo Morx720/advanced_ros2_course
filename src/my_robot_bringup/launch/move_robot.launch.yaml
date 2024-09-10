@@ -18,3 +18,14 @@ launch:
         name: "robot_name"
         value: "A"
 
+- node:
+    pkg: "lifecycle_py"
+    exec: "move_to_position_startup"
+    param:
+    -
+        name: "managed_node_names"
+        value: 
+            - "move_to_position_server_a"
+            - "move_to_position_server_b"
+
+
