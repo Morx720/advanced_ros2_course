@@ -14,6 +14,14 @@ class MoveToPositionNode(LifecycleNode):
     def __init__(self):
         super().__init__("move_to_position")
         
+        self.goal_policy_ = 2 
+        self.goal_handle_: ServerGoalHandle = None
+        self.goal_lock_ = threading.Lock()
+        self.goal_queue_ =[]
+        self.server_activated_ = False
+
+    def on_configure(self, state: LifecycleState):
+        
         #Parameter
         self.declare_parameter("min_pos", 0)
         self.min_pos_ = self.get_parameter("min_pos").value
@@ -21,25 +29,20 @@ class MoveToPositionNode(LifecycleNode):
         self.max_pos_ = self.get_parameter("max_pos").value
         self.declare_parameter("start_pos", 50)
         self.position_ = self.get_parameter("start_pos").value
+        self.declare_parameter("robot_name", "robot1")
+        self.robot_name_ = self.get_parameter("robot_name").value
         
-        self.goal_policy_ = 2 
-        self.goal_handle_: ServerGoalHandle = None
-        self.goal_lock_ = threading.Lock()
-        self.goal_queue_ =[]
-        self.server_activated_ = False
-
-        self.get_logger().info("current position: "+ str(self.position_))
-
-    def on_configure(self, state: LifecycleState):
         self.move_to_position_ = ActionServer(self, 
                                         MoveToPos, 
-                                        "move_to_pos", 
+                                        "move_"+self.robot_name_+"_to_pos", 
                                         goal_callback=self.goal_callback,
                                         handle_accepted_callback=self.handle_accepted_callback,
                                         execute_callback=self.execute_callback,
                                         cancel_callback= self.cancel_callback,
                                         callback_group=ReentrantCallbackGroup())
         self.get_logger().info("move_to_position_server has been started")
+        self.get_logger().info("current position: "+ str(self.position_))
+
         return TransitionCallbackReturn.SUCCESS
     
     def on_activate(self, state: LifecycleState):
@@ -57,10 +60,19 @@ class MoveToPositionNode(LifecycleNode):
         return super().on_deactivate(state)
     
     def on_cleanup(self, state: LifecycleState):
+        self.undeclare_parameter("min_pos")
+        self.undeclare_parameter("max_pos")
+        self.undeclare_parameter("start_pos")
+        self.undeclare_parameter("robot_name")
+        
         self.move_to_position_.destroy()
         return TransitionCallbackReturn.SUCCESS
     
     def on_shutdown(self, state: LifecycleState):
+        self.undeclare_parameter("min_pos")
+        self.undeclare_parameter("max_pos")
+        self.undeclare_parameter("start_pos")
+        self.undeclare_parameter("robot_name")
         self.move_to_position_.destroy()
         return TransitionCallbackReturn.SUCCESS
     
