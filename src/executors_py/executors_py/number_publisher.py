@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-
+from rclpy.executors import SingleThreadedExecutor
 from example_interfaces.msg import Int64
 
 class NumberPublisherNode(Node):
@@ -31,5 +31,9 @@ class NumberPublisherNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = NumberPublisherNode()
-    rclpy.spin(node)
+    
+    executor = SingleThreadedExecutor()
+    executor.add_node(node)
+    executor.spin()
+
     rclpy.shutdown()
